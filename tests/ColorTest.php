@@ -141,4 +141,20 @@ class ColorTest extends PHPUnit_Framework_TestCase
         }
     }
 
+    public function testRandColor()
+    {
+        $colors = [];
+        for ($i = 0; $i < 50; $i++) {
+            $colors[] = Color::rand();
+        }
+
+        $gen    = count($colors);
+        $colors = array_unique($colors);
+        $unique = count($colors);
+        $diff   = $gen - $unique + 1;
+
+        $this->assertEquals($gen, $unique, "There were {$diff} duplicates");
+
+    }
+
 }

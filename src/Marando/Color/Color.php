@@ -130,6 +130,33 @@ class Color
         return static::rgb($r, $g, $b);
     }
 
+    /**
+     * Generates a random color. Minimum and maximum values are specified for
+     * all of the HSL components.
+     *
+     * @param array $h Random hue min/max, 0-360
+     * @param array $s Random saturation min/max, 0-1
+     * @param array $l Random lightness min/max, 0-1
+     *
+     * @return Color
+     */
+    public static function rand($h = [0, 360], $s = [0, 1], $l = [0, 1])
+    {
+        static::validateComp('H low', $h[0], 0, 360);
+        static::validateComp('S low', $s[0], 0, 1);
+        static::validateComp('L low', $l[0], 0, 1);
+
+        static::validateComp('H high', $h[1], 0, 360);
+        static::validateComp('S high', $s[1], 0, 1);
+        static::validateComp('L high', $l[1], 0, 1);
+
+        $h = static::randFloat($h[0], $h[1]);
+        $s = static::randFloat($s[0], $s[1]);
+        $l = static::randFloat($l[0], $l[1]);
+
+        return static::hsl($h, $s, $l);
+    }
+
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
@@ -187,6 +214,24 @@ class Color
     //--------------------------------------------------------------------------
     // Functions
     //--------------------------------------------------------------------------
+
+    /**
+     * Calculates the distance between this color and another.
+     *
+     * @param Color $c
+     *
+     * @return float
+     */
+    public function dist(Color $c)
+    {
+        return sqrt(
+          ($c->r - $this->r) ** 2 +
+          ($c->g - $this->g) ** 2 +
+          ($c->b - $this->b) ** 2
+        );
+    }
+
+    // // // Private
 
     /**
      * Calculates this color's HSL components.
@@ -427,6 +472,19 @@ class Color
     private static function pmod($i, $n)
     {
         return ($i % $n + $n) % $n;
+    }
+
+    /**
+     * Generates a random float between $min and $max
+     *
+     * @param $min Minimum float value
+     * @param $max Maximum float value
+     *
+     * @return float|int
+     */
+    private static function randFloat($min, $max)
+    {
+        return mt_rand(0, mt_getrandmax()) / mt_getrandmax() * $max;
     }
 
     //--------------------------------------------------------------------------
