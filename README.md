@@ -1,6 +1,8 @@
 Color for PHP
 =============
 
+_PHP class to represent and convert colors_
+
 ## Installation
 
 ```shell
