@@ -15,17 +15,31 @@ class ColorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(255, $color->b);
     }
 
-    public function testInvalidRGBlow()
+    public function testInvalidHueLow()
     {
-        $this->expectException(Exception::class);
-        $color = Color::rgb(-1, 0, 0);
+        $color = Color::hsl(-170, 0.5, 0.5);
+        $this->assertEquals(190, $color->h);
     }
 
-    public function testInvalidRGBhigh()
+    public function testInvalidHueHigh()
     {
         $this->expectException(Exception::class);
-        $color = Color::rgb(256, 0, 0);
+        $color = Color::hsl(480, 2, 0);
+        $this->assertEquals(120, $color->h);
     }
+
+    public function testInvalidSatLow()
+    {
+        $this->expectException(Exception::class);
+        $color = Color::hsl(0, -5, 0);
+    }
+
+    public function testInvalidSatHigh()
+    {
+        $this->expectException(Exception::class);
+        $color = Color::hsl(0, 2, 0);
+    }
+
 
     public function testGetHSL()
     {
@@ -101,11 +115,16 @@ class ColorTest extends PHPUnit_Framework_TestCase
     public function testHex2rgb()
     {
         $colors = [
-          [85, 255, 204, '#5fc'],
-          [123, 169, 71, '#7ba947'],
+          [85, 255, 204, '#5fC'],
+          [123, 169, 71, '#7Ba947'],
           [4, 35, 37, '#042325'],
           [0, 0, 0, '#000000'],
-          [255, 255, 255, '#ffffff'],
+          [255, 255, 255, '#fffFFf'],
+          [0, 0, 0, '#000'],
+          [255, 255, 255, '#fff'],
+          [255, 136, 0, '#f80'],
+          [4, 35, 37, '042325'],
+          [255, 255, 255, 'fff'],
         ];
 
         foreach ($colors as $c) {

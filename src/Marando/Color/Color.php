@@ -20,7 +20,7 @@
 
 namespace Marando\Color;
 
-use PHPUnit\Framework\Constraint\Exception;
+use \Exception;
 
 /**
  * Represents an 8-bit color.
@@ -65,11 +65,6 @@ class Color
      */
     private function __construct($r, $g, $b)
     {
-        // Check if values are in range.
-        $this->validateRGB('R', $r);
-        $this->validateRGB('G', $g);
-        $this->validateRGB('B', $b);
-
         $this->r = $r;
         $this->g = $g;
         $this->b = $b;
@@ -88,6 +83,11 @@ class Color
      */
     public static function rgb($r = 255, $g = 255, $b = 255)
     {
+        // Check if values are in range.
+        static::validateComp('R', $r, 0, 255);
+        static::validateComp('G', $g, 0, 255);
+        static::validateComp('B', $b, 0, 255);
+
         return new static($r, $g, $b);
     }
 
@@ -104,22 +104,27 @@ class Color
      */
     public static function hsl($h = 360, $s = 1, $l = 1)
     {
-        // HSL -> RGB
-        static::hsl2rgb($h, $s, $l, $r, $g, $b);
+        // Check if values are in range.
+        static::validateComp('S', $s, 0, 1);
+        static::validateComp('L', $l, 0, 1);
+
+        // HSL -> RGB       Hue % +0-360
+        static::hsl2rgb(static::pmod($h, 360), $s, $l, $r, $g, $b);
 
         return static::rgb($r, $g, $b);
     }
 
     /**
-     * Creates a new Color instance from an RGB hex color code. Both siz digit
+     * Creates a new Color instance from an RGB hex color code. Both six digit
      * and 3 digit hex codes are supported.
      *
-     * @param $hex
+     * @param $hex Hex color in format #7d52eb or #7d5.
      *
      * @return Color
      */
     public static function hex($hex)
     {
+        // RGB Hex -> RGB
         static::hex2rgb($hex, $r, $g, $b);
 
         return static::rgb($r, $g, $b);
@@ -148,13 +153,13 @@ class Color
                 return $this->calcHSL();
 
             case 'h':
-                return $this->calcHSL()[0];
+                return $this->hsl[0];
 
             case 's':
-                return $this->calcHSL()[1];
+                return $this->hsl[1];
 
             case 'l':
-                return $this->calcHSL()[2];
+                return $this->hsl[2];
 
             case 'hex':
                 return $this->calcHex();
@@ -166,15 +171,15 @@ class Color
     {
         switch ($name) {
             case 'r':
-                $this->validateRGB('R', $value);
+                $this->validateComp('R', $value, 0, 255);
                 $this->rgb[0] = round($value);
 
             case 'g':
-                $this->validateRGB('G', $value);
+                $this->validateComp('G', $value, 0, 255);
                 $this->rgb[1] = round($value);
 
             case 'b':
-                $this->validateRGB('B', $value);
+                $this->validateComp('B', $value, 0, 255);
                 $this->rgb[2] = round($value);
         }
     }
@@ -183,24 +188,62 @@ class Color
     // Functions
     //--------------------------------------------------------------------------
 
+    /**
+     * Calculates this color's HSL components.
+     *
+     * @return array
+     */
     private function calcHSL()
     {
+        // RGB -> HSL
         self::rgb2hsl($this->r, $this->g, $this->b, $h, $s, $l);
 
         return [$h, $s, $l];
     }
 
-    private function validateRGB($component, $value)
+    /**
+     * Calculates this color as an RGB hex code.
+     *
+     * @return string
+     */
+    private function calcHex()
     {
-        if ($value < 0 || $value > 255) {
-            throw new \Exception("{$component} value {$value} must be 0-255");
-        }
+        // RGB -> RGB Hex
+        return static::rgb2hex($this->r, $this->g, $this->b);
     }
 
     //--------------------------------------------------------------------------
     // Static Functions
     //--------------------------------------------------------------------------
 
+    /**
+     * Validates a color component to see if fits within a range.
+     *
+     * @param $component Name of the component.
+     * @param $value     Value of the component.
+     * @param $min       Min value allowed.
+     * @param $max       Max value allowed.
+     *
+     * @throws Exception
+     */
+    private static function validateComp($component, $value, $min, $max)
+    {
+        if ($value < $min || $value > $max) {
+            throw new Exception(
+              "{$component} component {$value} must be {$min}-{$max}");
+        }
+    }
+
+    /**
+     * Converts HSL to RGB.
+     *
+     * @param $h Hue, 0-360°
+     * @param $s Saturation, 0-1
+     * @param $l Lightness, 0-1
+     * @param $r Red, 0-255
+     * @param $g Green, 0-255
+     * @param $b Blue, 0-255
+     */
     private static function hsl2rgb($h, $s, $l, &$r, &$g, &$b)
     {
         if ($s == 0) {
@@ -279,6 +322,16 @@ class Color
         $b = round($b * 255);
     }
 
+    /**
+     * Converts RGB to HSL.
+     *
+     * @param $r Red, 0-255
+     * @param $g Green, 0-255
+     * @param $b Blue, 0-255
+     * @param $h Hue, 0-360°
+     * @param $s Saturation, 0-1
+     * @param $l Lightness, 0-1
+     */
     private static function rgb2hsl($r, $g, $b, &$h, &$s, &$l)
     {
         $r /= 255;
@@ -319,21 +372,41 @@ class Color
         $s = round($s, 2);
     }
 
+    /**
+     * Converts RGB to an RGB Hex code.
+     *
+     * @param $r Red, 0-255
+     * @param $g Green, 0-255
+     * @param $b Blue, 0-255
+     *
+     * @return string Hex code in format #7d52eb
+     */
     private static function rgb2hex($r, $g, $b)
     {
         return sprintf('#%02x%02x%02x', $r, $g, $b);
     }
 
+    /**
+     * Converts an RGB Hex code to RGB.
+     *
+     * @param $hex RGB Hex code, in format #7d52eb or #7d5
+     * @param $r   Red, 0-255
+     * @param $g   Green, 0-255
+     * @param $b   Blue,0-255
+     */
     private static function hex2rgb($hex, &$r, &$g, &$b)
     {
         // Remove hash if present
         $hex = preg_replace('/[^a-fA-F0-9]/', '', $hex);
 
+
         if (strlen($hex) == 6) {
+            // 6-digit hex
             $r = substr($hex, 0, 2);
             $g = substr($hex, 2, 2);
             $b = substr($hex, 4, 2);
         } else {
+            // 3-digit hex, pad to 6 total...
             $r = $hex[0] . $hex[0];
             $g = $hex[1] . $hex[1];
             $b = $hex[2] . $hex[2];
@@ -344,10 +417,22 @@ class Color
         $b = hexdec($b);
     }
 
-    private function calcHex()
+    /**
+     * Positive modulus of i by n.
+     *
+     * @param $i
+     * @param $n
+     *
+     * @return int
+     */
+    private static function pmod($i, $n)
     {
-        return static::rgb2hex($this->r, $this->g, $this->b);
+        return ($i % $n + $n) % $n;
     }
+
+    //--------------------------------------------------------------------------
+    // Overrides
+    //--------------------------------------------------------------------------
 
     function __toString()
     {
