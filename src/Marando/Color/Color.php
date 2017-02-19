@@ -399,7 +399,6 @@ class Color
         // Remove hash if present
         $hex = preg_replace('/[^a-fA-F0-9]/', '', $hex);
 
-
         if (strlen($hex) == 6) {
             // 6-digit hex
             $r = substr($hex, 0, 2);
