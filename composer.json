@@ -1,0 +1,20 @@
+{
+  "name": "marando/color",
+  "require-dev": {
+    "phpunit/phpunit": "^6.0",
+    "symfony/var-dumper": "^3.2"
+  },
+  "license": "GNU3",
+  "authors": [
+    {
+      "name": "Ashley Marando",
+      "email": "a.marando@me.com"
+    }
+  ],
+  "require": {},
+  "autoload": {
+    "psr-0": {
+      "Marando": "src/"
+    }
+  }
+}
