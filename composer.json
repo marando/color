@@ -1,6 +1,6 @@
 {
   "name": "marando/color",
-  "description": "PHP class to represent and convert colors."
+  "description": "PHP class to represent and convert colors.",
   "require-dev": {
     "phpunit/phpunit": "^6.0",
     "symfony/var-dumper": "^3.2"
