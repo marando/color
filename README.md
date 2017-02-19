@@ -22,12 +22,14 @@ use Marando/Color/Color;
 ```php
 $color = Color::rgb(0, 255, 0);
 ```
+>**Note:** RGB values can range from 0 to 255.
 
 **From HSL**
 
 ```php
 $color = Color::hsl(180, 0.5, 0.5);
 ```
+>**Note:** Hue can range from 0 to 360, saturation and luminance 0 to 1.
 
 **From Hex**
 
@@ -35,6 +37,7 @@ $color = Color::hsl(180, 0.5, 0.5);
 $color = Color::hex('#f80');
 $color = Color::hex('#7c60e2');
 ```
+>**Note:** Both three and six digit hex codes are supported.
 
 ### Conversions
 
