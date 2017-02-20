@@ -142,19 +142,42 @@ class Color
      */
     public static function rand($h = [0, 360], $s = [0, 1], $l = [0, 1])
     {
+        // Validate input criteria
         static::validateComp('H low', $h[0], 0, 360);
         static::validateComp('S low', $s[0], 0, 1);
         static::validateComp('L low', $l[0], 0, 1);
-
         static::validateComp('H high', $h[1], 0, 360);
         static::validateComp('S high', $s[1], 0, 1);
         static::validateComp('L high', $l[1], 0, 1);
 
-        $h = static::randFloat($h[0], $h[1]);
-        $s = static::randFloat($s[0], $s[1]);
-        $l = static::randFloat($l[0], $l[1]);
+        // Loop until calculated random HSL -> RGB -> HSL value matches params.
+        $i = 0;
+        while (true) {
+            // Random HSL color
+            $color = static::hsl(
+              static::randFloat($h[0], $h[1], 1),
+              static::randFloat($s[0], $s[1], 0.001),
+              static::randFloat($l[0], $l[1], 0.001)
+            );
 
-        return static::hsl($h, $s, $l);
+            // Check if the HSL matches the input criteria
+            $hMatch = $color->h >= $h[0] && $color->h <= $h[1];
+            $sMatch = $color->s >= $s[0] && $color->s <= $s[1];
+            $lMatch = $color->l >= $l[0] && $color->l <= $l[1];
+
+            if ($hMatch && $sMatch && $lMatch) {
+                // Match found...
+                break;
+            } elseif ($i > 50) {
+                // Stop if not found by now.
+                throw new Exception();
+                break;
+            } else {
+                $i++;
+            }
+        }
+
+        return $color;
     }
 
     //--------------------------------------------------------------------------
@@ -477,14 +500,17 @@ class Color
     /**
      * Generates a random float between $min and $max
      *
-     * @param $min Minimum float value
-     * @param $max Maximum float value
+     * @param float     $min      Minimum float value
+     * @param float     $max      Maximum float value
+     * @param float|int $decimals Decimal Precision
      *
      * @return float|int
      */
-    private static function randFloat($min, $max)
+    private static function randFloat($min, $max, $decimals = 0.01)
     {
-        return mt_rand(0, mt_getrandmax()) / mt_getrandmax() * $max;
+        $decimals = 1 / $decimals;
+
+        return mt_rand($min * $decimals, $max * $decimals) / $decimals;
     }
 
     //--------------------------------------------------------------------------

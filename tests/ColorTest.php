@@ -157,4 +157,52 @@ class ColorTest extends PHPUnit_Framework_TestCase
 
     }
 
+    public function testRandParamsHue()
+    {
+        $step = 1;
+        for ($i = $step; $i < 360; $i += $step) {
+            $min = $i - $step;
+            $max = $i;
+
+            $color = Color::rand([$min, $max], [0, 1], [0, 1]);
+
+            $this->assertTrue(
+              $color->h <= $max && $color->h >= $min,
+              "Hue {$color->h} is not between {$min} and {$max}"
+            );
+        }
+    }
+
+    public function testRandParamsSat()
+    {
+        $step = 0.01;
+        for ($i = $step; $i < 1; $i += $step) {
+            $min = $i - $step;
+            $max = $i;
+
+            $color = Color::rand([0, 360], [$min, $max], [0, 1]);
+
+            $this->assertTrue(
+              $color->s <= $max && $color->s >= $min,
+              "Sat {$color->s} is not between {$min} and {$max}"
+            );
+        }
+    }
+
+    public function testRandParamsLum()
+    {
+        $step = 0.01;
+        for ($i = $step; $i < 1; $i += $step) {
+            $min = $i - $step;
+            $max = $i;
+
+            $color = Color::rand([0, 360], [0, 1], [$min, $max]);
+
+            $this->assertTrue(
+              $color->l <= $max && $color->l >= $min,
+              "Lum {$color->l} is not between {$min} and {$max}"
+            );
+        }
+    }
+
 }
