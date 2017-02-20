@@ -144,7 +144,7 @@ class ColorTest extends PHPUnit_Framework_TestCase
     public function testRandColor()
     {
         $colors = [];
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $colors[] = Color::rand();
         }
 
@@ -203,6 +203,46 @@ class ColorTest extends PHPUnit_Framework_TestCase
               "Lum {$color->l} is not between {$min} and {$max}"
             );
         }
+    }
+
+    public function testDist()
+    {
+        $black = Color::hex('#000');
+        $white = Color::hex('#fff');
+
+        $amethyst = Color::hex('#9668c2');
+
+        $blackDist = $amethyst->dist($black);
+        $whiteDist = $amethyst->dist($white);
+
+        $this->assertGreaterThan($whiteDist, $blackDist);
+    }
+
+    public function testParseHSL()
+    {
+        $color = Color::parse('hsl(90,90%,50%)');
+        $this->assertEquals('#80f20d', $color->hex, '#80f20d');
+
+        $color = Color::parse('hsl(9, 9%, 5%)');
+        $this->assertEquals('#0e0c0c', $color->hex, '#0e0c0c');
+    }
+
+    public function testParseRGB()
+    {
+        $color = Color::parse('rgb(23,217,143)');
+        $this->assertEquals('#17d98f', $color->hex, '#17d98f');
+
+        $color = Color::parse('rgb(217, 204, 23)');
+        $this->assertEquals('#d9cc17', $color->hex, '#d9cc17');
+    }
+
+    public function testParseHex()
+    {
+        $color = Color::parse('#fff');
+        $this->assertEquals('#ffffff', $color->hex, '#ffffff');
+
+        $color = Color::parse('c9189d');
+        $this->assertEquals('#c9189d', $color->hex, '#c9189d');
     }
 
 }

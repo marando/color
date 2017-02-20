@@ -139,6 +139,7 @@ class Color
      * @param array $l Random lightness min/max, 0-1
      *
      * @return Color
+     * @throws Exception
      */
     public static function rand($h = [0, 360], $s = [0, 1], $l = [0, 1])
     {
@@ -178,6 +179,31 @@ class Color
         }
 
         return $color;
+    }
+
+    /**
+     * Parses an HTML color in either hex, hsl, or rgb.
+     *
+     * @param $color
+     *
+     * @return Color
+     */
+    public static function parse($color)
+    {
+        $hsl = '/hsl\(([0-9]{1,3}),\s*([0-9]{1,3})%,\s*([0-9]{1,3})%\)/';
+        $rgb = '/rgb\(([0-9]{1,3}),\s*([0-9]{1,3}),\s*([0-9]{1,3})\)/';
+
+        // HSL
+        if (preg_match($hsl, $color, $m)) {
+            return static::hsl((int)$m[1], (int)$m[2] / 100, (int)$m[3] / 100);
+        } // RGB
+        elseif (preg_match($rgb, $color, $m)) {
+            return static::rgb((int)$m[1], (int)$m[2], (int)$m[3]);
+        } // Hex
+        else {
+            return static::hex($color);
+        };
+
     }
 
     //--------------------------------------------------------------------------
