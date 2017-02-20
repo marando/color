@@ -19,6 +19,16 @@ use Marando/Color/Color;
 
 ### Creating a Color
 
+**Parse**
+
+A hsl, rgb or hex HTML string representing a color can be parsed:
+
+```php
+Color::parse('hsl(90,90%,50%)');  // #17d98f
+Color::parse('rgb(23,217,143)');  // #80f20d
+Color::parse('c9189d');           // #c9189d
+```
+
 **From RGB**
 
 ```php
