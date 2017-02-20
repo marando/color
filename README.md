@@ -82,6 +82,7 @@ $color->hex;  // #40bfbf
 ### Miscellaneous
 
 **Color Distance**
+
 This can be used to compare distances between colors. In the example below the color amethyst is "closer" to white than it is black. This is useful for determining appropriate contrast colors.
 
 ```php
